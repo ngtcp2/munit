@@ -1228,8 +1228,13 @@ static void munit_splice(int from, int to) {
     if (len > 0) {
       bytes_written = 0;
       do {
-        write_res =
-            write(to, buf + bytes_written, (size_t)(len - bytes_written));
+        write_res = write(to, buf + bytes_written,
+#if !defined(_WIN32)
+                          (size_t)
+#else
+                          (unsigned int)
+#endif
+                              (len - bytes_written));
         if (write_res < 0)
           break;
         bytes_written += write_res;
