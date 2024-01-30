@@ -503,6 +503,24 @@ int munit_suite_main_custom(const MunitSuite *suite, void *user_data, int argc,
 
 #endif /* defined(MUNIT_ENABLE_ASSERT_ALIASES) */
 
+#define munit_void_test_decl(func)                                             \
+  void func(void);                                                             \
+                                                                               \
+  static inline MunitResult wrap_##func(const MunitParameter params[],         \
+                                        void *fixture) {                       \
+    (void)params;                                                              \
+    (void)fixture;                                                             \
+                                                                               \
+    func();                                                                    \
+    return MUNIT_OK;                                                           \
+  }
+
+#define munit_void_test(func)                                                  \
+  { "/" #func, wrap_##func, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+
+#define munit_test_end()                                                       \
+  { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+
 #if defined(__cplusplus)
 }
 #endif
