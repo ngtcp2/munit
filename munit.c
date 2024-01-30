@@ -811,11 +811,10 @@ static psnip_uint64_t munit_clock_get_elapsed(struct PsnipClockTimespec *start,
                                               struct PsnipClockTimespec *end) {
   psnip_uint64_t r = (end->seconds - start->seconds) * PSNIP_CLOCK_NSEC_PER_SEC;
   if (end->nanoseconds < start->nanoseconds) {
-    r -= (start->nanoseconds - end->nanoseconds);
-  } else {
-    r += (end->nanoseconds - start->nanoseconds);
+    return r - (start->nanoseconds - end->nanoseconds);
   }
-  return r;
+
+  return r + (end->nanoseconds - start->nanoseconds);
 }
 
 #else
@@ -1207,7 +1206,7 @@ static munit_uint32_t munit_str_hash(const char *name) {
   munit_uint32_t h = 5381U;
 
   for (p = name; *p != '\0'; p++)
-    h = (h << 5) + h + (munit_uint32_t)*p;
+    h = (munit_uint32_t)(h << 5) + h + (munit_uint32_t)*p;
 
   return h;
 }
