@@ -556,7 +556,8 @@ psnip_clock__clock_getres(clockid_t clk_id) {
   if (r != 0)
     return 0;
 
-  return (psnip_uint32_t)(PSNIP_CLOCK_NSEC_PER_SEC / res.tv_nsec);
+  return (psnip_uint32_t)(PSNIP_CLOCK_NSEC_PER_SEC /
+                          (psnip_uint64_t)res.tv_nsec);
 }
 
 PSNIP_CLOCK__FUNCTION int
@@ -662,14 +663,14 @@ psnip_clock_cpu_get_time(struct PsnipClockTimespec *res) {
     return -7;
 
   /* http://www.frenk.com/2009/12/convert-filetime-to-unix-timestamp/ */
-  date.HighPart = UserTime.dwHighDateTime;
+  date.HighPart = (LONG)UserTime.dwHighDateTime;
   date.LowPart = UserTime.dwLowDateTime;
   adjust.QuadPart = 11644473600000 * 10000;
   date.QuadPart -= adjust.QuadPart;
 
-  res->seconds = date.QuadPart / 10000000;
-  res->nanoseconds =
-      (date.QuadPart % 10000000) * (PSNIP_CLOCK_NSEC_PER_SEC / 100);
+  res->seconds = (psnip_uint64_t)(date.QuadPart / 10000000);
+  res->nanoseconds = (psnip_uint64_t)(date.QuadPart % 10000000) *
+                     (PSNIP_CLOCK_NSEC_PER_SEC / 100);
 #    elif PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_GETRUSAGE
   struct rusage usage;
   if (getrusage(RUSAGE_SELF, &usage) != 0)
@@ -742,12 +743,12 @@ psnip_clock_monotonic_get_time(struct PsnipClockTimespec *res) {
     return -12;
 
   QueryPerformanceFrequency(&f);
-  res->seconds = t.QuadPart / f.QuadPart;
-  res->nanoseconds = t.QuadPart % f.QuadPart;
+  res->seconds = (psnip_uint64_t)(t.QuadPart / f.QuadPart);
+  res->nanoseconds = (psnip_uint64_t)(t.QuadPart % f.QuadPart);
   if (f.QuadPart > PSNIP_CLOCK_NSEC_PER_SEC)
-    res->nanoseconds /= f.QuadPart / PSNIP_CLOCK_NSEC_PER_SEC;
+    res->nanoseconds /= (psnip_uint64_t)f.QuadPart / PSNIP_CLOCK_NSEC_PER_SEC;
   else
-    res->nanoseconds *= PSNIP_CLOCK_NSEC_PER_SEC / f.QuadPart;
+    res->nanoseconds *= PSNIP_CLOCK_NSEC_PER_SEC / (psnip_uint64_t)f.QuadPart;
 #    elif defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                             \
         PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_GETTICKCOUNT64
   const ULONGLONG msec = GetTickCount64();
