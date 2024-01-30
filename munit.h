@@ -131,13 +131,6 @@ extern "C" {
 #  define MUNIT_UNUSED
 #endif
 
-#if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L) &&              \
-    !defined(__PGI)
-#  define MUNIT_ARRAY_PARAM(name) name
-#else
-#  define MUNIT_ARRAY_PARAM(name)
-#endif
-
 #if !defined(_WIN32)
 #  define MUNIT_SIZE_MODIFIER "z"
 #  define MUNIT_CHAR_MODIFIER "hh"
@@ -385,8 +378,7 @@ void munit_rand_seed(munit_uint32_t seed);
 munit_uint32_t munit_rand_uint32(void);
 int munit_rand_int_range(int min, int max);
 double munit_rand_double(void);
-void munit_rand_memory(size_t size,
-                       munit_uint8_t buffer[MUNIT_ARRAY_PARAM(size)]);
+void munit_rand_memory(size_t size, munit_uint8_t *buffer);
 
 /*** Tests and Suites ***/
 
@@ -428,7 +420,7 @@ typedef void *(*MunitTestSetup)(const MunitParameter params[], void *user_data);
 typedef void (*MunitTestTearDown)(void *fixture);
 
 typedef struct {
-  char *name;
+  const char *name;
   MunitTestFunc test;
   MunitTestSetup setup;
   MunitTestTearDown tear_down;
@@ -441,15 +433,15 @@ typedef enum { MUNIT_SUITE_OPTION_NONE = 0 } MunitSuiteOptions;
 typedef struct MunitSuite_ MunitSuite;
 
 struct MunitSuite_ {
-  char *prefix;
-  MunitTest *tests;
-  MunitSuite *suites;
+  const char *prefix;
+  const MunitTest *tests;
+  const MunitSuite *suites;
   unsigned int iterations;
   MunitSuiteOptions options;
 };
 
 int munit_suite_main(const MunitSuite *suite, void *user_data, int argc,
-                     char *const argv[MUNIT_ARRAY_PARAM(argc + 1)]);
+                     char *const *argv);
 
 /* Note: I'm not very happy with this API; it's likely to change if I
  * figure out something better.  Suggestions welcome. */
@@ -459,14 +451,12 @@ typedef struct MunitArgument_ MunitArgument;
 struct MunitArgument_ {
   char *name;
   munit_bool (*parse_argument)(const MunitSuite *suite, void *user_data,
-                               int *arg, int argc,
-                               char *const argv[MUNIT_ARRAY_PARAM(argc + 1)]);
+                               int *arg, int argc, char *const *argv);
   void (*write_help)(const MunitArgument *argument, void *user_data);
 };
 
 int munit_suite_main_custom(const MunitSuite *suite, void *user_data, int argc,
-                            char *const argv[MUNIT_ARRAY_PARAM(argc + 1)],
-                            const MunitArgument arguments[]);
+                            char *const *argv, const MunitArgument arguments[]);
 
 #if defined(MUNIT_ENABLE_ASSERT_ALIASES)
 

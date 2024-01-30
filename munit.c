@@ -1012,9 +1012,8 @@ munit_uint32_t munit_rand_uint32(void) {
   return munit_rand_from_state(old);
 }
 
-static void
-munit_rand_state_memory(munit_uint32_t *state, size_t size,
-                        munit_uint8_t data[MUNIT_ARRAY_PARAM(size)]) {
+static void munit_rand_state_memory(munit_uint32_t *state, size_t size,
+                                    munit_uint8_t *data) {
   size_t members_remaining = size / sizeof(munit_uint32_t);
   size_t bytes_remaining = size % sizeof(munit_uint32_t);
   munit_uint8_t *b = data;
@@ -1030,8 +1029,7 @@ munit_rand_state_memory(munit_uint32_t *state, size_t size,
   }
 }
 
-void munit_rand_memory(size_t size,
-                       munit_uint8_t data[MUNIT_ARRAY_PARAM(size)]) {
+void munit_rand_memory(size_t size, munit_uint8_t *data) {
   munit_uint32_t old, state;
 
   do {
@@ -1084,7 +1082,7 @@ int munit_rand_int_range(int min, int max) {
   if (range > (~((munit_uint32_t)0U)))
     range = (~((munit_uint32_t)0U));
 
-  return min + munit_rand_at_most(0, (munit_uint32_t)range);
+  return min + (int)munit_rand_at_most(0, (munit_uint32_t)range);
 }
 
 double munit_rand_double(void) {
@@ -1150,10 +1148,9 @@ static void munit_print_time(FILE *fp, munit_uint64_t nanoseconds) {
 #endif
 
 /* Add a paramter to an array of parameters. */
-static MunitResult
-munit_parameters_add(size_t *params_size,
-                     MunitParameter *params[MUNIT_ARRAY_PARAM(*params_size)],
-                     char *name, char *value) {
+static MunitResult munit_parameters_add(size_t *params_size,
+                                        MunitParameter **params, char *name,
+                                        char *value) {
   *params = realloc(*params, sizeof(MunitParameter) * (*params_size + 2));
   if (*params == NULL)
     return MUNIT_ERROR;
@@ -1210,7 +1207,7 @@ static munit_uint32_t munit_str_hash(const char *name) {
   munit_uint32_t h = 5381U;
 
   for (p = name; *p != '\0'; p++)
-    h = (h << 5) + h + *p;
+    h = (h << 5) + h + (munit_uint32_t)*p;
 
   return h;
 }
@@ -1231,7 +1228,8 @@ static void munit_splice(int from, int to) {
     if (len > 0) {
       bytes_written = 0;
       do {
-        write_res = write(to, buf + bytes_written, len - bytes_written);
+        write_res =
+            write(to, buf + bytes_written, (size_t)(len - bytes_written));
         if (write_res < 0)
           break;
         bytes_written += write_res;
@@ -1393,7 +1391,6 @@ munit_test_runner_run_test_with_params(MunitTestRunner *runner,
 #if !defined(MUNIT_NO_FORK)
   int pipefd[2];
   pid_t fork_pid;
-  int orig_stderr;
   ssize_t bytes_written = 0;
   ssize_t write_res;
   ssize_t bytes_read = 0;
@@ -1414,8 +1411,8 @@ munit_test_runner_run_test_with_params(MunitTestRunner *runner,
         first = 0;
       }
 
-      output_l +=
-          fprintf(MUNIT_OUTPUT_FILE, "%s=%s", param->name, param->value);
+      output_l += (unsigned int)fprintf(MUNIT_OUTPUT_FILE, "%s=%s", param->name,
+                                        param->value);
     }
     while (output_l++ < MUNIT_TEST_NAME_LEN) {
       fputc(' ', MUNIT_OUTPUT_FILE);
@@ -1449,6 +1446,8 @@ munit_test_runner_run_test_with_params(MunitTestRunner *runner,
 
     fork_pid = fork();
     if (fork_pid == 0) {
+      int orig_stderr;
+
       close(pipefd[0]);
 
       orig_stderr = munit_replace_stderr(stderr_buf);
@@ -1462,7 +1461,7 @@ munit_test_runner_run_test_with_params(MunitTestRunner *runner,
       do {
         write_res =
             write(pipefd[1], ((munit_uint8_t *)(&report)) + bytes_written,
-                  sizeof(report) - bytes_written);
+                  sizeof(report) - (size_t)bytes_written);
         if (write_res < 0) {
           if (stderr_buf != NULL) {
             munit_log_errno(MUNIT_LOG_ERROR, stderr, "unable to write to pipe");
@@ -1489,7 +1488,7 @@ munit_test_runner_run_test_with_params(MunitTestRunner *runner,
       close(pipefd[1]);
       do {
         read_res = read(pipefd[0], ((munit_uint8_t *)(&report)) + bytes_read,
-                        sizeof(report) - bytes_read);
+                        sizeof(report) - (size_t)bytes_read);
         if (read_res < 1)
           break;
         bytes_read += read_res;
@@ -1731,7 +1730,7 @@ static void munit_test_runner_run_test(MunitTestRunner *runner,
          * running a single test, but we don't want every test with
          * the same number of parameters to choose the same parameter
          * number, so use the test name as a primitive salt. */
-        pidx = munit_rand_at_most(munit_str_hash(test_name), possible - 1);
+        pidx = (int)munit_rand_at_most(munit_str_hash(test_name), possible - 1);
         if (MUNIT_UNLIKELY(munit_parameters_add(&params_l, &params, pe->name,
                                                 pe->values[pidx]) != MUNIT_OK))
           goto cleanup;
@@ -1822,56 +1821,56 @@ static void munit_test_runner_run(MunitTestRunner *runner) {
   munit_test_runner_run_suite(runner, runner->suite, NULL);
 }
 
-static void munit_print_help(int argc,
-                             char *const argv[MUNIT_ARRAY_PARAM(argc + 1)],
-                             void *user_data, const MunitArgument arguments[]) {
+static void munit_print_help(int argc, char *const *argv, void *user_data,
+                             const MunitArgument arguments[]) {
   const MunitArgument *arg;
   (void)argc;
 
   printf("USAGE: %s [OPTIONS...] [TEST...]\n\n", argv[0]);
-  puts(" --seed SEED\n"
-       "           Value used to seed the PRNG.  Must be a 32-bit integer in "
-       "decimal\n"
-       "           notation with no separators (commas, decimals, spaces, "
-       "etc.), or\n"
-       "           hexidecimal prefixed by \"0x\".\n"
-       " --iterations N\n"
-       "           Run each test N times.  0 means the default number.\n"
-       " --param name value\n"
-       "           A parameter key/value pair which will be passed to any test "
-       "with\n"
-       "           takes a parameter of that name.  If not provided, the test "
-       "will be\n"
-       "           run once for each possible parameter value.\n"
-       " --list    Write a list of all available tests.\n"
-       " --list-params\n"
-       "           Write a list of all available tests and their possible "
-       "parameters.\n"
-       " --single  Run each parameterized test in a single configuration "
-       "instead of\n"
-       "           every possible combination\n"
-       " --log-visible debug|info|warning|error\n"
-       " --log-fatal debug|info|warning|error\n"
-       "           Set the level at which messages of different severities are "
-       "visible,\n"
-       "           or cause the test to terminate.\n"
+  puts(
+      " --seed SEED\n"
+      "           Value used to seed the PRNG.  Must be a 32-bit integer in "
+      "decimal\n"
+      "           notation with no separators (commas, decimals, spaces, "
+      "etc.), or\n"
+      "           hexidecimal prefixed by \"0x\".\n"
+      " --iterations N\n"
+      "           Run each test N times.  0 means the default number.\n"
+      " --param name value\n"
+      "           A parameter key/value pair which will be passed to any test "
+      "with\n"
+      "           takes a parameter of that name.  If not provided, the test "
+      "will be\n"
+      "           run once for each possible parameter value.\n"
+      " --list    Write a list of all available tests.\n"
+      " --list-params\n"
+      "           Write a list of all available tests and their possible "
+      "parameters.\n"
+      " --single  Run each parameterized test in a single configuration "
+      "instead of\n"
+      "           every possible combination\n"
+      " --log-visible debug|info|warning|error\n"
+      " --log-fatal debug|info|warning|error\n"
+      "           Set the level at which messages of different severities are "
+      "visible,\n"
+      "           or cause the test to terminate.\n"
 #if !defined(MUNIT_NO_FORK)
-       " --no-fork Do not execute tests in a child process.  If this option is "
-       "supplied\n"
-       "           and a test crashes (including by failing an assertion), no "
-       "further\n"
-       "           tests will be performed.\n"
+      " --no-fork Do not execute tests in a child process.  If this option is "
+      "supplied\n"
+      "           and a test crashes (including by failing an assertion), no "
+      "further\n"
+      "           tests will be performed.\n"
 #endif
-       " --fatal-failures\n"
-       "           Stop executing tests as soon as a failure is found.\n"
-       " --show-stderr\n"
-       "           Show data written to stderr by the tests, even if the test "
-       "succeeds.\n"
-       " --color auto|always|never\n"
-       "           Colorize (or don't) the output.\n"
-       /* 12345678901234567890123456789012345678901234567890123456789012345678901234567890
-        */
-       " --help    Print this help message and exit.\n");
+      " --fatal-failures\n"
+      "           Stop executing tests as soon as a failure is found.\n"
+      " --show-stderr\n"
+      "           Show data written to stderr by the tests, even if the test "
+      "succeeds.\n"
+      " --color auto|always|never\n"
+      "           Colorize (or don't) the output.\n"
+      /* 12345678901234567890123456789012345678901234567890123456789012345678901234567890
+       */
+      " --help    Print this help message and exit.\n");
 #if defined(MUNIT_NL_LANGINFO)
   setlocale(LC_ALL, "");
   fputs((strcasecmp("UTF-8", nl_langinfo(CODESET)) == 0) ? "µnit" : "munit",
@@ -1966,7 +1965,7 @@ static munit_bool munit_stream_supports_ansi(FILE *stream) {
 }
 
 int munit_suite_main_custom(const MunitSuite *suite, void *user_data, int argc,
-                            char *const argv[MUNIT_ARRAY_PARAM(argc + 1)],
+                            char *const *argv,
                             const MunitArgument arguments[]) {
   int result = EXIT_FAILURE;
   MunitTestRunner runner;
@@ -2204,6 +2203,6 @@ cleanup:
 }
 
 int munit_suite_main(const MunitSuite *suite, void *user_data, int argc,
-                     char *const argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+                     char *const *argv) {
   return munit_suite_main_custom(suite, user_data, argc, argv, NULL);
 }
