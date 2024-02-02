@@ -4,3 +4,5 @@
 /example
 /*.exe
 /*.dll
+.dirstamp
+.deps
