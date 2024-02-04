@@ -2359,47 +2359,52 @@ int munit_hexdump(FILE *fp, const void *data, size_t datalen) {
 
 int munit_hexdump_diff(FILE *fp, const void *a, size_t alen, const void *b,
                        size_t blen) {
-  size_t offset = 0, i, len, na, nb, ncomp, maxlen;
+  size_t offset = 0, k, i, len, ncomp, maxlen;
   uint8_t buf[128], *p;
-  const uint8_t *sa, *sb;
+  struct datasource {
+    const uint8_t *data;
+    size_t datalen;
+    const uint8_t *s;
+    size_t n;
+  } ds[] = {{a, alen, NULL, 0}, {b, blen, NULL, 0}}, *dp;
 
   maxlen = alen < blen ? blen : alen;
 
   for (; offset < maxlen; offset += 16) {
-    if (alen < offset) {
-      sa = NULL;
-      na = 0;
-    } else {
-      sa = (const uint8_t *)a + offset;
-      na = alen - offset;
-      if (na > 16) {
-        na = 16;
+    for (k = 0; k < 2; ++k) {
+      dp = &ds[k];
+
+      if (offset < dp->datalen) {
+        dp->s = (const uint8_t *)dp->data + offset;
+        dp->n = dp->datalen - offset;
+
+        if (dp->n > 16) {
+          dp->n = 16;
+        }
+      } else {
+        dp->s = NULL;
+        dp->n = 0;
       }
     }
 
-    if (blen < offset) {
-      sb = NULL;
-      nb = 0;
-    } else {
-      sb = (const uint8_t *)b + offset;
-      nb = blen - offset;
-      if (nb > 16) {
-        nb = 16;
-      }
-    }
-
-    if (na == nb && memcmp(sa, sb, na) == 0) {
+    if (ds[0].n == ds[1].n && memcmp(ds[0].s, ds[1].s, ds[0].n) == 0) {
       continue;
     }
 
-    if (na) {
+    for (k = 0; k < 2; ++k) {
+      dp = &ds[k];
+
+      if (!dp->n) {
+        continue;
+      }
+
       p = buf;
       *p++ = '-';
       *p++ = '-';
       *p++ = '-';
       *p++ = ' ';
 
-      p = hexdump_line(p, sa, na, offset);
+      p = hexdump_line(p, dp->s, dp->n, offset);
       *p++ = '\n';
 
       len = (size_t)(p - buf);
@@ -2409,35 +2414,18 @@ int munit_hexdump_diff(FILE *fp, const void *a, size_t alen, const void *b,
       }
     }
 
-    if (nb) {
-      p = buf;
-      *p++ = '+';
-      *p++ = '+';
-      *p++ = '+';
-      *p++ = ' ';
-
-      p = hexdump_line(p, sb, nb, offset);
-      *p++ = '\n';
-
-      len = (size_t)(p - buf);
-
-      if (fwrite(buf, 1, len, fp) < len) {
-        return -1;
-      }
-    }
-
-    if (!na || !nb) {
+    if (!ds[0].n || !ds[1].n) {
       continue;
     }
 
-    ncomp = na < nb ? na : nb;
+    ncomp = ds[0].n < ds[1].n ? ds[0].n : ds[1].n;
 
     p = buf + 4 + 9;
 
     memset(buf, ' ', (size_t)(p - buf));
 
     for (i = 0; i < ncomp; ++i) {
-      if (sa[i] == sb[i]) {
+      if (ds[0].s[i] == ds[1].s[i]) {
         *p++ = ' ';
         *p++ = ' ';
       } else {
