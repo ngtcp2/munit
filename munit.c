@@ -2211,3 +2211,237 @@ int munit_suite_main(const MunitSuite *suite, void *user_data, int argc,
                      char *const *argv) {
   return munit_suite_main_custom(suite, user_data, argc, argv, NULL);
 }
+
+static uint8_t hexchars[] = "0123456789abcdef";
+
+static uint8_t *hexdump_addr(uint8_t *dest, size_t addr) {
+  size_t i;
+  uint8_t a;
+
+  for (i = 0; i < 4; ++i) {
+    a = (addr >> (3 - i) * 8) & 0xff;
+
+    *dest++ = hexchars[a >> 4];
+    *dest++ = hexchars[a & 0xf];
+  }
+
+  return dest;
+}
+
+static uint8_t *asciidump(uint8_t *dest, const uint8_t *data, size_t datalen) {
+  size_t i;
+
+  *dest++ = '|';
+
+  for (i = 0; i < datalen; ++i) {
+    if (0x20 <= data[i] && data[i] <= 0x7e) {
+      *dest++ = data[i];
+    } else {
+      *dest++ = '.';
+    }
+  }
+
+  *dest++ = '|';
+
+  return dest;
+}
+
+static uint8_t *hexdump8(uint8_t *dest, const uint8_t *data, size_t datalen) {
+  size_t i;
+
+  for (i = 0; i < datalen; ++i) {
+    *dest++ = hexchars[data[i] >> 4];
+    *dest++ = hexchars[data[i] & 0xf];
+    *dest++ = ' ';
+  }
+
+  for (; i < 8; ++i) {
+    *dest++ = ' ';
+    *dest++ = ' ';
+    *dest++ = ' ';
+  }
+
+  return dest;
+}
+
+static uint8_t *hexdump16(uint8_t *dest, const uint8_t *data, size_t datalen) {
+  dest = hexdump8(dest, data, datalen < 8 ? datalen : 8);
+  *dest++ = ' ';
+
+  if (datalen < 8) {
+    data = NULL;
+    datalen = 0;
+  } else {
+    data += 8;
+    datalen -= 8;
+  }
+
+  dest = hexdump8(dest, data, datalen);
+  *dest++ = ' ';
+
+  return dest;
+}
+
+static uint8_t *hexdump_line(uint8_t *dest, const uint8_t *data, size_t datalen,
+                             size_t addr) {
+  dest = hexdump_addr(dest, addr);
+  *dest++ = ' ';
+
+  dest = hexdump16(dest, data, datalen);
+  *dest++ = ' ';
+
+  dest = asciidump(dest, data, datalen);
+
+  return dest;
+}
+
+int munit_hexdump(FILE *fp, const void *data, size_t datalen) {
+  size_t offset = 0, n, len;
+  uint8_t buf[128], *p;
+  const uint8_t *s;
+  int repeated = 0;
+
+  if (datalen == 0) {
+    return 0;
+  }
+
+  for (; offset <= datalen; offset += 16) {
+    n = datalen - offset;
+
+    if (n == 0) {
+      p = hexdump_addr(buf, offset);
+      *p++ = '\n';
+
+      len = (size_t)(p - buf);
+
+      if (fwrite(buf, 1, len, fp) < len) {
+        return -1;
+      }
+
+      return 0;
+    }
+
+    s = (const uint8_t *)data + offset;
+
+    if (n >= 16) {
+      n = 16;
+
+      if (offset > 0) {
+        if (memcmp(s - 16, s, 16) == 0) {
+          if (repeated) {
+            continue;
+          }
+
+          repeated = 1;
+
+          if (fwrite("*\n", 1, 2, fp) < 2) {
+            return -1;
+          }
+
+          continue;
+        }
+
+        repeated = 0;
+      }
+    }
+
+    p = hexdump_line(buf, s, n, offset);
+    *p++ = '\n';
+
+    len = (size_t)(p - buf);
+
+    if (fwrite(buf, 1, len, fp) < len) {
+      return -1;
+    }
+  }
+
+  return 0;
+}
+
+int munit_hexdump_diff(FILE *fp, const void *a, size_t alen, const void *b,
+                       size_t blen) {
+  size_t offset = 0, i, len, na, nb, ncomp;
+  uint8_t buf[128], *p;
+  const uint8_t *sa, *sb;
+
+  for (; offset < alen && offset < blen; offset += 16) {
+    na = alen - offset;
+    if (na > 16) {
+      na = 16;
+    }
+
+    nb = blen - offset;
+    if (nb > 16) {
+      nb = 16;
+    }
+
+    sa = (const uint8_t *)a + offset;
+    sb = (const uint8_t *)b + offset;
+
+    if (na == nb && memcmp(sa, sb, na) == 0) {
+      continue;
+    }
+
+    p = buf;
+    *p++ = '-';
+    *p++ = '-';
+    *p++ = '-';
+    *p++ = ' ';
+
+    p = hexdump_line(p, sa, na, offset);
+    *p++ = '\n';
+
+    len = (size_t)(p - buf);
+
+    if (fwrite(buf, 1, len, fp) < len) {
+      return -1;
+    }
+
+    p = buf;
+    *p++ = '+';
+    *p++ = '+';
+    *p++ = '+';
+    *p++ = ' ';
+
+    p = hexdump_line(p, sb, nb, offset);
+    *p++ = '\n';
+
+    len = (size_t)(p - buf);
+
+    if (fwrite(buf, 1, len, fp) < len) {
+      return -1;
+    }
+
+    ncomp = na < nb ? na : nb;
+
+    p = buf + 4 + 9;
+
+    memset(buf, ' ', (size_t)(p - buf));
+
+    for (i = 0; i < ncomp; ++i) {
+      if (sa[i] == sb[i]) {
+        *p++ = ' ';
+        *p++ = ' ';
+      } else {
+        *p++ = '^';
+        *p++ = '^';
+      }
+
+      *p++ = ' ';
+
+      if (i == 7) {
+        *p++ = ' ';
+      }
+    }
+
+    *p++ = '\n';
+
+    len = (size_t)(p - buf);
+
+    if (fwrite(buf, 1, len, fp) < len) {
+      return -1;
+    }
+  }
+
+  return 0;
+}

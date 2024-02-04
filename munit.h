@@ -27,6 +27,7 @@
 
 #include <stdarg.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 #define MUNIT_VERSION(major, minor, revision)                                  \
   (((major) << 16) | ((minor) << 8) | (revision))
@@ -305,6 +306,8 @@ void munit_errorf_ex(const char *filename, int line, const char *format, ...);
     const char *munit_tmp_a_ = a;                                              \
     const char *munit_tmp_b_ = b;                                              \
     if (MUNIT_UNLIKELY(strcmp(munit_tmp_a_, munit_tmp_b_) != 0)) {             \
+      munit_hexdump_diff(stderr, munit_tmp_a_, strlen(munit_tmp_a_),           \
+                         munit_tmp_b_, strlen(munit_tmp_b_));                  \
       munit_errorf("assertion failed: string %s == %s (\"%s\" == \"%s\")", #a, \
                    #b, munit_tmp_a_, munit_tmp_b_);                            \
     }                                                                          \
@@ -316,6 +319,8 @@ void munit_errorf_ex(const char *filename, int line, const char *format, ...);
     const char *munit_tmp_a_ = a;                                              \
     const char *munit_tmp_b_ = b;                                              \
     if (MUNIT_UNLIKELY(strcmp(munit_tmp_a_, munit_tmp_b_) == 0)) {             \
+      munit_hexdump_diff(stderr, munit_tmp_a_, strlen(munit_tmp_a_),           \
+                         munit_tmp_b_, strlen(munit_tmp_b_));                  \
       munit_errorf("assertion failed: string %s != %s (\"%s\" == \"%s\")", #a, \
                    #b, munit_tmp_a_, munit_tmp_b_);                            \
     }                                                                          \
@@ -333,6 +338,7 @@ void munit_errorf_ex(const char *filename, int line, const char *format, ...);
       for (munit_tmp_pos_ = 0; munit_tmp_pos_ < munit_tmp_size_;               \
            munit_tmp_pos_++) {                                                 \
         if (munit_tmp_a_[munit_tmp_pos_] != munit_tmp_b_[munit_tmp_pos_]) {    \
+          munit_hexdump_diff(stderr, munit_tmp_a_, size, munit_tmp_b_, size);  \
           munit_errorf("assertion failed: memory %s == %s, at offset "         \
                        "%" MUNIT_SIZE_MODIFIER "u",                            \
                        #a, #b, munit_tmp_pos_);                                \
@@ -350,6 +356,7 @@ void munit_errorf_ex(const char *filename, int line, const char *format, ...);
     const size_t munit_tmp_size_ = (size);                                     \
     if (MUNIT_UNLIKELY(memcmp(munit_tmp_a_, munit_tmp_b_, munit_tmp_size_)) == \
         0) {                                                                   \
+      munit_hexdump_diff(stderr, munit_tmp_a_, size, munit_tmp_b_, size);      \
       munit_errorf("assertion failed: memory %s != %s (%zu bytes)", #a, #b,    \
                    munit_tmp_size_);                                           \
     }                                                                          \
@@ -525,6 +532,11 @@ int munit_suite_main_custom(const MunitSuite *suite, void *user_data, int argc,
 
 #define munit_test_end()                                                       \
   { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+
+int munit_hexdump(FILE *fp, const void *data, size_t datalen);
+
+int munit_hexdump_diff(FILE *fp, const void *a, size_t alen, const void *b,
+                       size_t blen);
 
 #if defined(__cplusplus)
 }
