@@ -319,8 +319,6 @@ void munit_errorf_ex(const char *filename, int line, const char *format, ...);
     const char *munit_tmp_a_ = a;                                              \
     const char *munit_tmp_b_ = b;                                              \
     if (MUNIT_UNLIKELY(strcmp(munit_tmp_a_, munit_tmp_b_) == 0)) {             \
-      munit_hexdump_diff(stderr, munit_tmp_a_, strlen(munit_tmp_a_),           \
-                         munit_tmp_b_, strlen(munit_tmp_b_));                  \
       munit_errorf("assertion failed: string %s != %s (\"%s\" == \"%s\")", #a, \
                    #b, munit_tmp_a_, munit_tmp_b_);                            \
     }                                                                          \
@@ -356,7 +354,6 @@ void munit_errorf_ex(const char *filename, int line, const char *format, ...);
     const size_t munit_tmp_size_ = (size);                                     \
     if (MUNIT_UNLIKELY(memcmp(munit_tmp_a_, munit_tmp_b_, munit_tmp_size_)) == \
         0) {                                                                   \
-      munit_hexdump_diff(stderr, munit_tmp_a_, size, munit_tmp_b_, size);      \
       munit_errorf("assertion failed: memory %s != %s (%zu bytes)", #a, #b,    \
                    munit_tmp_size_);                                           \
     }                                                                          \
