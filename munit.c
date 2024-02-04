@@ -2288,7 +2288,6 @@ static uint8_t *hexdump_line(uint8_t *dest, const uint8_t *data, size_t datalen,
   *dest++ = ' ';
 
   dest = hexdump16(dest, data, datalen);
-  *dest++ = ' ';
 
   dest = asciidump(dest, data, datalen);
 
