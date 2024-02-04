@@ -2359,56 +2359,75 @@ int munit_hexdump(FILE *fp, const void *data, size_t datalen) {
 
 int munit_hexdump_diff(FILE *fp, const void *a, size_t alen, const void *b,
                        size_t blen) {
-  size_t offset = 0, i, len, na, nb, ncomp;
+  size_t offset = 0, i, len, na, nb, ncomp, maxlen;
   uint8_t buf[128], *p;
   const uint8_t *sa, *sb;
 
-  for (; offset < alen && offset < blen; offset += 16) {
-    na = alen - offset;
-    if (na > 16) {
-      na = 16;
+  maxlen = alen < blen ? blen : alen;
+
+  for (; offset < maxlen; offset += 16) {
+    if (alen < offset) {
+      sa = NULL;
+      na = 0;
+    } else {
+      sa = (const uint8_t *)a + offset;
+      na = alen - offset;
+      if (na > 16) {
+        na = 16;
+      }
     }
 
-    nb = blen - offset;
-    if (nb > 16) {
-      nb = 16;
+    if (blen < offset) {
+      sb = NULL;
+      nb = 0;
+    } else {
+      sb = (const uint8_t *)b + offset;
+      nb = blen - offset;
+      if (nb > 16) {
+        nb = 16;
+      }
     }
-
-    sa = (const uint8_t *)a + offset;
-    sb = (const uint8_t *)b + offset;
 
     if (na == nb && memcmp(sa, sb, na) == 0) {
       continue;
     }
 
-    p = buf;
-    *p++ = '-';
-    *p++ = '-';
-    *p++ = '-';
-    *p++ = ' ';
+    if (na) {
+      p = buf;
+      *p++ = '-';
+      *p++ = '-';
+      *p++ = '-';
+      *p++ = ' ';
 
-    p = hexdump_line(p, sa, na, offset);
-    *p++ = '\n';
+      p = hexdump_line(p, sa, na, offset);
+      *p++ = '\n';
 
-    len = (size_t)(p - buf);
+      len = (size_t)(p - buf);
 
-    if (fwrite(buf, 1, len, fp) < len) {
-      return -1;
+      if (fwrite(buf, 1, len, fp) < len) {
+        return -1;
+      }
     }
 
-    p = buf;
-    *p++ = '+';
-    *p++ = '+';
-    *p++ = '+';
-    *p++ = ' ';
+    if (nb) {
+      p = buf;
+      *p++ = '+';
+      *p++ = '+';
+      *p++ = '+';
+      *p++ = ' ';
 
-    p = hexdump_line(p, sb, nb, offset);
-    *p++ = '\n';
+      p = hexdump_line(p, sb, nb, offset);
+      *p++ = '\n';
 
-    len = (size_t)(p - buf);
+      len = (size_t)(p - buf);
 
-    if (fwrite(buf, 1, len, fp) < len) {
-      return -1;
+      if (fwrite(buf, 1, len, fp) < len) {
+        return -1;
+      }
+    }
+
+    if (!na || !nb) {
+      continue;
     }
 
     ncomp = na < nb ? na : nb;
