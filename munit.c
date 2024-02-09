@@ -2286,6 +2286,7 @@ static uint8_t *hexdump_line(uint8_t *dest, const uint8_t *data, size_t datalen,
                              size_t addr) {
   dest = hexdump_addr(dest, addr);
   *dest++ = ' ';
+  *dest++ = ' ';
 
   dest = hexdump16(dest, data, datalen);
 
@@ -2359,8 +2360,9 @@ int munit_hexdump(FILE *fp, const void *data, size_t datalen) {
 
 int munit_hexdump_diff(FILE *fp, const void *a, size_t alen, const void *b,
                        size_t blen) {
-  size_t offset = 0, k, i, len, ncomp, maxlen;
+  size_t offset = 0, k, i, len, ncomp, maxlen, adoff = 0;
   uint8_t buf[128], *p;
+  const uint8_t mk[2] = {'-', '+'};
   struct datasource {
     const uint8_t *data;
     size_t datalen;
@@ -2399,10 +2401,10 @@ int munit_hexdump_diff(FILE *fp, const void *a, size_t alen, const void *b,
       }
 
       p = buf;
-      *p++ = '-';
-      *p++ = '-';
-      *p++ = '-';
-      *p++ = ' ';
+      *p++ = mk[k];
+      *p++ = mk[k];
+      *p++ = mk[k];
+      *p++ = mk[k];
 
       p = hexdump_line(p, dp->s, dp->n, offset);
       *p++ = '\n';
@@ -2420,15 +2422,18 @@ int munit_hexdump_diff(FILE *fp, const void *a, size_t alen, const void *b,
 
     ncomp = ds[0].n < ds[1].n ? ds[0].n : ds[1].n;
 
-    p = buf + 4 + 9;
+    p = buf + 4 + 10;
 
-    memset(buf, ' ', (size_t)(p - buf));
+    memset(buf, ' ', 4 + 78);
 
     for (i = 0; i < ncomp; ++i) {
       if (ds[0].s[i] == ds[1].s[i]) {
         *p++ = ' ';
         *p++ = ' ';
       } else {
+        adoff = 4 + 10 + 51 + i;
+        *(buf + adoff) = '^';
+
         *p++ = '^';
         *p++ = '^';
       }
@@ -2440,9 +2445,13 @@ int munit_hexdump_diff(FILE *fp, const void *a, size_t alen, const void *b,
       }
     }
 
-    *p++ = '\n';
+    if (adoff) {
+      len = adoff + 1;
+    } else {
+      len = (size_t)(p - buf);
+    }
 
-    len = (size_t)(p - buf);
+    buf[len++] = '\n';
 
     if (fwrite(buf, 1, len, fp) < len) {
       return -1;
