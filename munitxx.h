@@ -30,7 +30,7 @@
 
 #include <string>
 
-#define assert_stdstring_equal(a, b)                                           \
+#define munit_assert_stdstring_equal(a, b)                                     \
   do {                                                                         \
     const std::string munit_tmp_a_ = a;                                        \
     const std::string munit_tmp_b_ = b;                                        \
@@ -42,5 +42,11 @@
     }                                                                          \
     MUNIT_PUSH_DISABLE_MSVC_C4127_                                             \
   } while (0) MUNIT_POP_DISABLE_MSVC_C4127_
+
+#if defined(MUNIT_ENABLE_ASSERT_ALIASES)
+
+#  define assert_stdstring_equal(a, b) munit_assert_stdstring_equal(a, b)
+
+#endif /* defined(MUNIT_ENABLE_ASSERT_ALIASES) */
 
 #endif // MUNITXX_H
