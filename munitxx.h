@@ -29,6 +29,7 @@
 #include <munit.h>
 
 #include <string>
+#include <string_view>
 
 #define munit_assert_stdstring_equal(a, b)                                     \
   do {                                                                         \
@@ -43,9 +44,24 @@
     MUNIT_PUSH_DISABLE_MSVC_C4127_                                             \
   } while (0) MUNIT_POP_DISABLE_MSVC_C4127_
 
+#define munit_assert_stdsv_equal(a, b)                                         \
+  do {                                                                         \
+    const std::string_view munit_tmp_a_ = a;                                   \
+    const std::string_view munit_tmp_b_ = b;                                   \
+    if (MUNIT_UNLIKELY(a != b)) {                                              \
+      munit_hexdump_diff(stderr, munit_tmp_a_.data(), munit_tmp_a_.size(),     \
+                         munit_tmp_b_.data(), munit_tmp_b_.size());            \
+      munit_errorf("assertion failed: string %s == %s (\"%.*s\" == \"%.*s\")", \
+                   #a, #b, (int)munit_tmp_a_.size(), munit_tmp_a_.data(),      \
+                   (int)munit_tmp_b_.size(), munit_tmp_b_.data());             \
+    }                                                                          \
+    MUNIT_PUSH_DISABLE_MSVC_C4127_                                             \
+  } while (0) MUNIT_POP_DISABLE_MSVC_C4127_
+
 #if defined(MUNIT_ENABLE_ASSERT_ALIASES)
 
 #  define assert_stdstring_equal(a, b) munit_assert_stdstring_equal(a, b)
+#  define assert_stdsv_equal(a, b) munit_assert_stdsv_equal(a, b)
 
 #endif /* defined(MUNIT_ENABLE_ASSERT_ALIASES) */
 
