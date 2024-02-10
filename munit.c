@@ -2305,22 +2305,8 @@ int munit_hexdump(FILE *fp, const void *data, size_t datalen) {
     return 0;
   }
 
-  for (; offset <= datalen; offset += 16) {
+  for (; offset < datalen; offset += 16) {
     n = datalen - offset;
-
-    if (n == 0) {
-      p = hexdump_addr(buf, offset);
-      *p++ = '\n';
-
-      len = (size_t)(p - buf);
-
-      if (fwrite(buf, 1, len, fp) < len) {
-        return -1;
-      }
-
-      return 0;
-    }
-
     s = (const uint8_t *)data + offset;
 
     if (n >= 16) {
@@ -2353,6 +2339,15 @@ int munit_hexdump(FILE *fp, const void *data, size_t datalen) {
     if (fwrite(buf, 1, len, fp) < len) {
       return -1;
     }
+  }
+
+  p = hexdump_addr(buf, datalen);
+  *p++ = '\n';
+
+  len = (size_t)(p - buf);
+
+  if (fwrite(buf, 1, len, fp) < len) {
+    return -1;
   }
 
   return 0;
