@@ -285,6 +285,8 @@ void munit_errorf_ex(const char *filename, int line, const char *format, ...);
 #define munit_assert_ptrdiff(a, op, b)                                         \
   munit_assert_type(ptrdiff_t, "td", a, op, b)
 
+#define munit_assert_enum(T, a, op, b) munit_assert_type(T, "d", a, op, b)
+
 #define munit_assert_double_equal(a, b, precision)                             \
   do {                                                                         \
     const double munit_tmp_a_ = (a);                                           \
@@ -494,6 +496,8 @@ int munit_suite_main_custom(const MunitSuite *suite, void *user_data, int argc,
 #  define assert_uint64(a, op, b) munit_assert_uint64(a, op, b)
 
 #  define assert_ptrdiff(a, op, b) munit_assert_ptrdiff(a, op, b)
+
+#  define assert_enum(T, a, op, b) munit_assert_enum(T, a, op, b)
 
 #  define assert_double_equal(a, b, precision)                                 \
     munit_assert_double_equal(a, b, precision)
