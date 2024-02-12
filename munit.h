@@ -351,6 +351,22 @@ void munit_errorf_ex(const char *filename, int line, const char *format, ...);
     MUNIT_PUSH_DISABLE_MSVC_C4127_                                             \
   } while (0) MUNIT_POP_DISABLE_MSVC_C4127_
 
+#define munit_assert_memn_equal(a, asize, b, bsize)                            \
+  do {                                                                         \
+    const unsigned char *munit_tmp_a_ = (const unsigned char *)(a);            \
+    const unsigned char *munit_tmp_b_ = (const unsigned char *)(b);            \
+    const size_t munit_tmp_asize_ = (asize);                                   \
+    const size_t munit_tmp_bsize_ = (bsize);                                   \
+    if (MUNIT_UNLIKELY(munit_tmp_asize_ != munit_tmp_bsize_) ||                \
+        MUNIT_UNLIKELY(munit_tmp_asize_ && memcmp(munit_tmp_a_, munit_tmp_b_,  \
+                                                  munit_tmp_asize_)) != 0) {   \
+      munit_hexdump_diff(stderr, munit_tmp_a_, munit_tmp_asize_, munit_tmp_b_, \
+                         munit_tmp_bsize_);                                    \
+      munit_errorf("assertion failed: memory %s == %s", #a, #b);               \
+    }                                                                          \
+    MUNIT_PUSH_DISABLE_MSVC_C4127_                                             \
+  } while (0) MUNIT_POP_DISABLE_MSVC_C4127_
+
 #define munit_assert_memory_not_equal(size, a, b)                              \
   do {                                                                         \
     const unsigned char *munit_tmp_a_ = (const unsigned char *)(a);            \
@@ -507,6 +523,8 @@ int munit_suite_main_custom(const MunitSuite *suite, void *user_data, int argc,
 #  define assert_string_equal(a, b) munit_assert_string_equal(a, b)
 #  define assert_string_not_equal(a, b) munit_assert_string_not_equal(a, b)
 #  define assert_memory_equal(size, a, b) munit_assert_memory_equal(size, a, b)
+#  define assert_memn_equal(a, asize, b, bsize)                                \
+    munit_assert_memn_equal(a, asize, b, bsize)
 #  define assert_memory_not_equal(size, a, b)                                  \
     munit_assert_memory_not_equal(size, a, b)
 #  define assert_ptr_equal(a, b) munit_assert_ptr_equal(a, b)
