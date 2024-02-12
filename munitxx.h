@@ -28,6 +28,7 @@
 
 #include <munit.h>
 
+#include <type_traits>
 #include <string>
 #if __cplusplus >= 201703L
 #  include <string_view>
