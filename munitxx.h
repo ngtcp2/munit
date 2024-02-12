@@ -63,17 +63,19 @@
     } while (0) MUNIT_POP_DISABLE_MSVC_C4127_
 #endif // __cplusplus >= 201703L
 
-#define munit_assert_enum_class(T, a, op, b)                                   \
+#define munit_assert_enum_class(a, op, b)                                      \
   do {                                                                         \
-    T munit_tmp_a_ = (a);                                                      \
-    T munit_tmp_b_ = (b);                                                      \
+    auto munit_tmp_a_ = (a);                                                   \
+    auto munit_tmp_b_ = (b);                                                   \
     if (!(munit_tmp_a_ op munit_tmp_b_)) {                                     \
-      auto sa = std::to_string(                                                \
-          static_cast<std::underlying_type_t<T>>(munit_tmp_a_));               \
-      auto sb = std::to_string(                                                \
-          static_cast<std::underlying_type_t<T>>(munit_tmp_b_));               \
+      auto munit_tmp_a_str_ = std::to_string(                                  \
+          static_cast<std::underlying_type_t<decltype(munit_tmp_a_)>>(         \
+              munit_tmp_a_));                                                  \
+      auto munit_tmp_b_str_ = std::to_string(                                  \
+          static_cast<std::underlying_type_t<decltype(munit_tmp_b_)>>(         \
+              munit_tmp_b_));                                                  \
       munit_errorf("assertion failed: %s %s %s (%s %s %s)", #a, #op, #b,       \
-                   sa.c_str(), #op, sb.c_str());                               \
+                   munit_tmp_a_str_.c_str(), #op, munit_tmp_b_str_.c_str());   \
     }                                                                          \
     MUNIT_PUSH_DISABLE_MSVC_C4127_                                             \
   } while (0) MUNIT_POP_DISABLE_MSVC_C4127_
@@ -84,7 +86,7 @@
 #  if __cplusplus >= 201703L
 #    define assert_stdsv_equal(a, b) munit_assert_stdsv_equal(a, b)
 #  endif // __cplusplus >= 201703L
-#  define assert_enum_class(T, a, op, b) munit_assert_enum_class(T, a, op, b)
+#  define assert_enum_class(a, op, b) munit_assert_enum_class(a, op, b)
 
 #endif /* defined(MUNIT_ENABLE_ASSERT_ALIASES) */
 
