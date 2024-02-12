@@ -259,6 +259,8 @@ void munit_errorf_ex(const char *filename, int line, const char *format, ...);
 
 #define munit_assert_size(a, op, b)                                            \
   munit_assert_type(size_t, MUNIT_SIZE_MODIFIER "u", a, op, b)
+#define munit_assert_ssize(a, op, b)                                           \
+  munit_assert_type(ssize_t, MUNIT_SIZE_MODIFIER "d", a, op, b)
 
 #define munit_assert_float(a, op, b) munit_assert_type(float, "f", a, op, b)
 #define munit_assert_double(a, op, b) munit_assert_type(double, "g", a, op, b)
@@ -482,6 +484,7 @@ int munit_suite_main_custom(const MunitSuite *suite, void *user_data, int argc,
 #  define assert_llong(a, op, b) munit_assert_llong(a, op, b)
 #  define assert_ullong(a, op, b) munit_assert_ullong(a, op, b)
 #  define assert_size(a, op, b) munit_assert_size(a, op, b)
+#  define assert_ssize(a, op, b) munit_assert_ssize(a, op, b)
 #  define assert_float(a, op, b) munit_assert_float(a, op, b)
 #  define assert_double(a, op, b) munit_assert_double(a, op, b)
 #  define assert_ptr(a, op, b) munit_assert_ptr(a, op, b)
