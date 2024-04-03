@@ -593,9 +593,9 @@ PSNIP_CLOCK__FUNCTION psnip_uint32_t psnip_clock_wall_get_precision(void) {
 
 PSNIP_CLOCK__FUNCTION int
 psnip_clock_wall_get_time(struct PsnipClockTimespec *res) {
+#    if !defined(PSNIP_CLOCK_WALL_METHOD)
   (void)res;
 
-#    if !defined(PSNIP_CLOCK_WALL_METHOD)
   return -2;
 #    elif defined(PSNIP_CLOCK_WALL_METHOD) &&                                  \
         PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
@@ -614,6 +614,8 @@ psnip_clock_wall_get_time(struct PsnipClockTimespec *res) {
   res->seconds = (psnip_uint64_t)tv.tv_sec;
   res->nanoseconds = (psnip_uint64_t)tv.tv_usec * 1000;
 #    else
+  (void)res;
+
   return -2;
 #    endif
 
