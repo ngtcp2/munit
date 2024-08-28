@@ -121,10 +121,10 @@
 #define MUNIT_XSTRINGIFY(x) MUNIT_STRINGIFY(x)
 
 #if defined(__GNUC__) || defined(__INTEL_COMPILER) || defined(__SUNPRO_CC) ||  \
-    defined(__IBMCPP__)
+  defined(__IBMCPP__)
 #  define MUNIT_THREAD_LOCAL __thread
 #elif (defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201102L)) ||          \
-    defined(_Thread_local)
+  defined(_Thread_local)
 #  define MUNIT_THREAD_LOCAL _Thread_local
 #elif defined(_WIN32)
 #  define MUNIT_THREAD_LOCAL __declspec(thread)
@@ -254,7 +254,7 @@ void munit_errorf_ex(const char *filename, int line, const char *format, ...) {
 
 static void munit_log_errno(MunitLogLevel level, FILE *fp, const char *msg) {
 #if defined(MUNIT_NO_STRERROR_R) ||                                            \
-    (defined(__MINGW32__) && !defined(MINGW_HAS_SECURE_API))
+  (defined(__MINGW32__) && !defined(MINGW_HAS_SECURE_API))
   munit_logf_internal(level, fp, "%s: %s (%d)", msg, strerror(errno), errno);
 #else
   char munit_error_str[MUNIT_STRERROR_LEN];
@@ -387,7 +387,7 @@ struct PsnipClockTimespec {
  * please let us know so we can add them. */
 #      if (defined(__GLIBC__) &&                                               \
            (__GLIBC__ > 2 || (__GLIBC__ == 2 && __GLIBC_MINOR__ >= 17))) ||    \
-          (defined(__FreeBSD__))
+        (defined(__FreeBSD__))
 #        define PSNIP_CLOCK_HAVE_CLOCK_GETTIME
 #      elif !defined(PSNIP_CLOCK_NO_LIBRT)
 #        define PSNIP_CLOCK_HAVE_CLOCK_GETTIME
@@ -461,7 +461,7 @@ struct PsnipClockTimespec {
 
 /* Primarily here for testing. */
 #    if !defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                              \
-        defined(PSNIP_CLOCK_REQUIRE_MONOTONIC)
+      defined(PSNIP_CLOCK_REQUIRE_MONOTONIC)
 #      error No monotonic clock found.
 #    endif
 
@@ -469,69 +469,67 @@ struct PsnipClockTimespec {
 
 #    if (defined(PSNIP_CLOCK_CPU_METHOD) &&                                    \
          (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME)) ||      \
-        (defined(PSNIP_CLOCK_WALL_METHOD) &&                                   \
-         (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME)) ||     \
-        (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                              \
-         (PSNIP_CLOCK_MONOTONIC_METHOD ==                                      \
-          PSNIP_CLOCK_METHOD_CLOCK_GETTIME)) ||                                \
-        (defined(PSNIP_CLOCK_CPU_METHOD) &&                                    \
-         (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK)) ||              \
-        (defined(PSNIP_CLOCK_WALL_METHOD) &&                                   \
-         (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_CLOCK)) ||             \
-        (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                              \
-         (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_CLOCK)) ||        \
-        (defined(PSNIP_CLOCK_CPU_METHOD) &&                                    \
-         (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_TIME)) ||               \
-        (defined(PSNIP_CLOCK_WALL_METHOD) &&                                   \
-         (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_TIME)) ||              \
-        (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                              \
-         (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_TIME))
+      (defined(PSNIP_CLOCK_WALL_METHOD) &&                                     \
+       (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME)) ||       \
+      (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                                \
+       (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME)) ||  \
+      (defined(PSNIP_CLOCK_CPU_METHOD) &&                                      \
+       (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK)) ||                \
+      (defined(PSNIP_CLOCK_WALL_METHOD) &&                                     \
+       (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_CLOCK)) ||               \
+      (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                                \
+       (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_CLOCK)) ||          \
+      (defined(PSNIP_CLOCK_CPU_METHOD) &&                                      \
+       (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_TIME)) ||                 \
+      (defined(PSNIP_CLOCK_WALL_METHOD) &&                                     \
+       (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_TIME)) ||                \
+      (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                                \
+       (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_TIME))
 #      include <time.h>
 #    endif
 
 #    if (defined(PSNIP_CLOCK_CPU_METHOD) &&                                    \
          (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_GETTIMEOFDAY)) ||       \
-        (defined(PSNIP_CLOCK_WALL_METHOD) &&                                   \
-         (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETTIMEOFDAY)) ||      \
-        (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                              \
-         (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_GETTIMEOFDAY))
+      (defined(PSNIP_CLOCK_WALL_METHOD) &&                                     \
+       (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETTIMEOFDAY)) ||        \
+      (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                                \
+       (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_GETTIMEOFDAY))
 #      include <sys/time.h>
 #    endif
 
 #    if (defined(PSNIP_CLOCK_CPU_METHOD) &&                                    \
          (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_GETPROCESSTIMES)) ||    \
-        (defined(PSNIP_CLOCK_WALL_METHOD) &&                                   \
-         (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETPROCESSTIMES)) ||   \
-        (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                              \
-         (PSNIP_CLOCK_MONOTONIC_METHOD ==                                      \
-          PSNIP_CLOCK_METHOD_GETPROCESSTIMES)) ||                              \
-        (defined(PSNIP_CLOCK_CPU_METHOD) &&                                    \
-         (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_GETTICKCOUNT64)) ||     \
-        (defined(PSNIP_CLOCK_WALL_METHOD) &&                                   \
-         (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETTICKCOUNT64)) ||    \
-        (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                              \
-         (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_GETTICKCOUNT64))
+      (defined(PSNIP_CLOCK_WALL_METHOD) &&                                     \
+       (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETPROCESSTIMES)) ||     \
+      (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                                \
+       (PSNIP_CLOCK_MONOTONIC_METHOD ==                                        \
+        PSNIP_CLOCK_METHOD_GETPROCESSTIMES)) ||                                \
+      (defined(PSNIP_CLOCK_CPU_METHOD) &&                                      \
+       (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_GETTICKCOUNT64)) ||       \
+      (defined(PSNIP_CLOCK_WALL_METHOD) &&                                     \
+       (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETTICKCOUNT64)) ||      \
+      (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                                \
+       (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_GETTICKCOUNT64))
 #      include <windows.h>
 #    endif
 
 #    if (defined(PSNIP_CLOCK_CPU_METHOD) &&                                    \
          (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_GETRUSAGE)) ||          \
-        (defined(PSNIP_CLOCK_WALL_METHOD) &&                                   \
-         (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETRUSAGE)) ||         \
-        (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                              \
-         (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_GETRUSAGE))
+      (defined(PSNIP_CLOCK_WALL_METHOD) &&                                     \
+       (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETRUSAGE)) ||           \
+      (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                                \
+       (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_GETRUSAGE))
 #      include <sys/time.h>
 #      include <sys/resource.h>
 #    endif
 
 #    if (defined(PSNIP_CLOCK_CPU_METHOD) &&                                    \
          (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_MACH_ABSOLUTE_TIME)) || \
-        (defined(PSNIP_CLOCK_WALL_METHOD) &&                                   \
-         (PSNIP_CLOCK_WALL_METHOD ==                                           \
-          PSNIP_CLOCK_METHOD_MACH_ABSOLUTE_TIME)) ||                           \
-        (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                              \
-         (PSNIP_CLOCK_MONOTONIC_METHOD ==                                      \
-          PSNIP_CLOCK_METHOD_MACH_ABSOLUTE_TIME))
+      (defined(PSNIP_CLOCK_WALL_METHOD) &&                                     \
+       (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_MACH_ABSOLUTE_TIME)) ||  \
+      (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                                \
+       (PSNIP_CLOCK_MONOTONIC_METHOD ==                                        \
+        PSNIP_CLOCK_METHOD_MACH_ABSOLUTE_TIME))
 #      include <CoreServices/CoreServices.h>
 #      include <mach/mach.h>
 #      include <mach/mach_time.h>
@@ -543,10 +541,10 @@ struct PsnipClockTimespec {
 
 #    if (defined(PSNIP_CLOCK_CPU_METHOD) &&                                    \
          (PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME)) ||      \
-        (defined(PSNIP_CLOCK_WALL_METHOD) &&                                   \
-         (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME)) ||     \
-        (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                              \
-         (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME))
+      (defined(PSNIP_CLOCK_WALL_METHOD) &&                                     \
+       (PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME)) ||       \
+      (defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                                \
+       (PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME))
 PSNIP_CLOCK__FUNCTION psnip_uint32_t
 psnip_clock__clock_getres(clockid_t clk_id) {
   struct timespec res;
@@ -578,13 +576,13 @@ PSNIP_CLOCK__FUNCTION psnip_uint32_t psnip_clock_wall_get_precision(void) {
 #    if !defined(PSNIP_CLOCK_WALL_METHOD)
   return 0;
 #    elif defined(PSNIP_CLOCK_WALL_METHOD) &&                                  \
-        PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
+      PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
   return psnip_clock__clock_getres(PSNIP_CLOCK_CLOCK_GETTIME_WALL);
 #    elif defined(PSNIP_CLOCK_WALL_METHOD) &&                                  \
-        PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETTIMEOFDAY
+      PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETTIMEOFDAY
   return 1000000;
 #    elif defined(PSNIP_CLOCK_WALL_METHOD) &&                                  \
-        PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_TIME
+      PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_TIME
   return 1;
 #    else
   return 0;
@@ -598,14 +596,14 @@ psnip_clock_wall_get_time(struct PsnipClockTimespec *res) {
 
   return -2;
 #    elif defined(PSNIP_CLOCK_WALL_METHOD) &&                                  \
-        PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
+      PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
   return psnip_clock__clock_gettime(PSNIP_CLOCK_CLOCK_GETTIME_WALL, res);
 #    elif defined(PSNIP_CLOCK_WALL_METHOD) &&                                  \
-        PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_TIME
+      PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_TIME
   res->seconds = time(NULL);
   res->nanoseconds = 0;
 #    elif defined(PSNIP_CLOCK_WALL_METHOD) &&                                  \
-        PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETTIMEOFDAY
+      PSNIP_CLOCK_WALL_METHOD == PSNIP_CLOCK_METHOD_GETTIMEOFDAY
   struct timeval tv;
 
   if (gettimeofday(&tv, NULL) != 0)
@@ -626,13 +624,13 @@ PSNIP_CLOCK__FUNCTION psnip_uint32_t psnip_clock_cpu_get_precision(void) {
 #    if !defined(PSNIP_CLOCK_CPU_METHOD)
   return 0;
 #    elif defined(PSNIP_CLOCK_CPU_METHOD) &&                                   \
-        PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
+      PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
   return psnip_clock__clock_getres(PSNIP_CLOCK_CLOCK_GETTIME_CPU);
 #    elif defined(PSNIP_CLOCK_CPU_METHOD) &&                                   \
-        PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK
+      PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK
   return CLOCKS_PER_SEC;
 #    elif defined(PSNIP_CLOCK_CPU_METHOD) &&                                   \
-        PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_GETPROCESSTIMES
+      PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_GETPROCESSTIMES
   return PSNIP_CLOCK_NSEC_PER_SEC / 100;
 #    else
   return 0;
@@ -645,18 +643,18 @@ psnip_clock_cpu_get_time(struct PsnipClockTimespec *res) {
   (void)res;
   return -2;
 #    elif defined(PSNIP_CLOCK_CPU_METHOD) &&                                   \
-        PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
+      PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
   return psnip_clock__clock_gettime(PSNIP_CLOCK_CLOCK_GETTIME_CPU, res);
 #    elif defined(PSNIP_CLOCK_CPU_METHOD) &&                                   \
-        PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK
+      PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_CLOCK
   clock_t t = clock();
   if (t == ((clock_t)-1))
     return -5;
   res->seconds = t / CLOCKS_PER_SEC;
   res->nanoseconds =
-      (t % CLOCKS_PER_SEC) * (PSNIP_CLOCK_NSEC_PER_SEC / CLOCKS_PER_SEC);
+    (t % CLOCKS_PER_SEC) * (PSNIP_CLOCK_NSEC_PER_SEC / CLOCKS_PER_SEC);
 #    elif defined(PSNIP_CLOCK_CPU_METHOD) &&                                   \
-        PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_GETPROCESSTIMES
+      PSNIP_CLOCK_CPU_METHOD == PSNIP_CLOCK_METHOD_GETPROCESSTIMES
   FILETIME CreationTime, ExitTime, KernelTime, UserTime;
   LARGE_INTEGER date, adjust;
 
@@ -692,27 +690,27 @@ PSNIP_CLOCK__FUNCTION psnip_uint32_t psnip_clock_monotonic_get_precision(void) {
 #    if !defined(PSNIP_CLOCK_MONOTONIC_METHOD)
   return 0;
 #    elif defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                             \
-        PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
+      PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
   return psnip_clock__clock_getres(PSNIP_CLOCK_CLOCK_GETTIME_MONOTONIC);
 #    elif defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                             \
-        PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_MACH_ABSOLUTE_TIME
+      PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_MACH_ABSOLUTE_TIME
   static mach_timebase_info_data_t tbi = {
-      0,
+    0,
   };
   if (tbi.denom == 0)
     mach_timebase_info(&tbi);
   return (psnip_uint32_t)(tbi.numer / tbi.denom);
 #    elif defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                             \
-        PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_GETTICKCOUNT64
+      PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_GETTICKCOUNT64
   return 1000;
 #    elif defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                             \
-        PSNIP_CLOCK_MONOTONIC_METHOD ==                                        \
-            PSNIP_CLOCK_METHOD_QUERYPERFORMANCECOUNTER
+      PSNIP_CLOCK_MONOTONIC_METHOD ==                                          \
+        PSNIP_CLOCK_METHOD_QUERYPERFORMANCECOUNTER
   LARGE_INTEGER Frequency;
   QueryPerformanceFrequency(&Frequency);
   return (psnip_uint32_t)((Frequency.QuadPart > PSNIP_CLOCK_NSEC_PER_SEC)
-                              ? PSNIP_CLOCK_NSEC_PER_SEC
-                              : Frequency.QuadPart);
+                            ? PSNIP_CLOCK_NSEC_PER_SEC
+                            : Frequency.QuadPart);
 #    else
   return 0;
 #    endif
@@ -724,13 +722,13 @@ psnip_clock_monotonic_get_time(struct PsnipClockTimespec *res) {
   (void)res;
   return -2;
 #    elif defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                             \
-        PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
+      PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_CLOCK_GETTIME
   return psnip_clock__clock_gettime(PSNIP_CLOCK_CLOCK_GETTIME_MONOTONIC, res);
 #    elif defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                             \
-        PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_MACH_ABSOLUTE_TIME
+      PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_MACH_ABSOLUTE_TIME
   psnip_uint64_t nsec = mach_absolute_time();
   static mach_timebase_info_data_t tbi = {
-      0,
+    0,
   };
   if (tbi.denom == 0)
     mach_timebase_info(&tbi);
@@ -738,8 +736,8 @@ psnip_clock_monotonic_get_time(struct PsnipClockTimespec *res) {
   res->seconds = nsec / PSNIP_CLOCK_NSEC_PER_SEC;
   res->nanoseconds = nsec % PSNIP_CLOCK_NSEC_PER_SEC;
 #    elif defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                             \
-        PSNIP_CLOCK_MONOTONIC_METHOD ==                                        \
-            PSNIP_CLOCK_METHOD_QUERYPERFORMANCECOUNTER
+      PSNIP_CLOCK_MONOTONIC_METHOD ==                                          \
+        PSNIP_CLOCK_METHOD_QUERYPERFORMANCECOUNTER
   LARGE_INTEGER t, f;
   if (QueryPerformanceCounter(&t) == 0)
     return -12;
@@ -752,7 +750,7 @@ psnip_clock_monotonic_get_time(struct PsnipClockTimespec *res) {
   else
     res->nanoseconds *= PSNIP_CLOCK_NSEC_PER_SEC / (psnip_uint64_t)f.QuadPart;
 #    elif defined(PSNIP_CLOCK_MONOTONIC_METHOD) &&                             \
-        PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_GETTICKCOUNT64
+      PSNIP_CLOCK_MONOTONIC_METHOD == PSNIP_CLOCK_METHOD_GETTICKCOUNT64
   const ULONGLONG msec = GetTickCount64();
   res->seconds = msec / 1000;
   res->nanoseconds = sec % 1000;
@@ -838,9 +836,9 @@ static psnip_uint64_t munit_clock_get_elapsed(struct PsnipClockTimespec *start,
  * chance of being reproducible. */
 
 #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L) &&              \
-    !defined(__STDC_NO_ATOMICS__) && !defined(__EMSCRIPTEN__) &&               \
-    (!defined(__GNUC_MINOR__) || (__GNUC__ > 4) ||                             \
-     (__GNUC__ == 4 && __GNUC_MINOR__ > 8))
+  !defined(__STDC_NO_ATOMICS__) && !defined(__EMSCRIPTEN__) &&                 \
+  (!defined(__GNUC_MINOR__) || (__GNUC__ > 4) ||                               \
+   (__GNUC__ == 4 && __GNUC_MINOR__ > 8))
 #  define HAVE_STDATOMIC
 #elif defined(__clang__)
 #  if __has_extension(c_atomic)
@@ -920,7 +918,7 @@ static inline uint32_t munit_atomic_cas(ATOMIC_UINT32_T *dest,
     __c11_atomic_compare_exchange_weak(dest, expected, value,                  \
                                        __ATOMIC_SEQ_CST, __ATOMIC_SEQ_CST)
 #elif defined(__GNUC__) && (__GNUC__ > 4) ||                                   \
-    (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
+  (__GNUC__ == 4 && __GNUC_MINOR__ >= 7)
 #  define munit_atomic_store(dest, value)                                      \
     __atomic_store_n(dest, value, __ATOMIC_SEQ_CST)
 #  define munit_atomic_load(src) __atomic_load_n(src, __ATOMIC_SEQ_CST)
@@ -984,7 +982,7 @@ static munit_uint32_t munit_rand_generate_seed(void) {
   munit_uint32_t seed, state;
 #if defined(MUNIT_ENABLE_TIMING)
   struct PsnipClockTimespec wc = {
-      0,
+    0,
   };
 
   psnip_clock_get_time(PSNIP_CLOCK_TYPE_WALL, &wc);
@@ -1236,7 +1234,7 @@ static void munit_splice(int from, int to) {
 #else
                           (unsigned int)
 #endif
-                              (len - bytes_written));
+                            (len - bytes_written));
         if (write_res < 0)
           break;
         bytes_written += write_res;
@@ -1255,18 +1253,18 @@ static MunitResult munit_test_runner_exec(MunitTestRunner *runner,
   MunitResult result = MUNIT_FAIL;
 #if defined(MUNIT_ENABLE_TIMING)
   struct PsnipClockTimespec wall_clock_begin =
-                                {
-                                    0,
-                                },
-                            wall_clock_end = {
+                              {
                                 0,
+                              },
+                            wall_clock_end = {
+                              0,
                             };
   struct PsnipClockTimespec cpu_clock_begin =
-                                {
-                                    0,
-                                },
-                            cpu_clock_end = {
+                              {
                                 0,
+                              },
+                            cpu_clock_end = {
+                              0,
                             };
 #endif
   unsigned int i = 0;
@@ -1302,9 +1300,9 @@ static MunitResult munit_test_runner_exec(MunitTestRunner *runner,
       report->successful++;
 #if defined(MUNIT_ENABLE_TIMING)
       report->wall_clock +=
-          munit_clock_get_elapsed(&wall_clock_begin, &wall_clock_end);
+        munit_clock_get_elapsed(&wall_clock_begin, &wall_clock_end);
       report->cpu_clock +=
-          munit_clock_get_elapsed(&cpu_clock_begin, &cpu_clock_end);
+        munit_clock_get_elapsed(&cpu_clock_begin, &cpu_clock_end);
 #endif
     } else {
       switch ((int)result) {
@@ -1381,14 +1379,9 @@ munit_test_runner_run_test_with_params(MunitTestRunner *runner,
                                        const MunitTest *test,
                                        const MunitParameter params[]) {
   MunitResult result = MUNIT_OK;
-  MunitReport report = {
-    0,
-    0,
-    0,
-    0,
+  MunitReport report = {0, 0, 0, 0,
 #if defined(MUNIT_ENABLE_TIMING)
-    0,
-    0
+                        0, 0
 #endif
   };
   unsigned int output_l;
@@ -1467,8 +1460,8 @@ munit_test_runner_run_test_with_params(MunitTestRunner *runner,
 
       do {
         write_res =
-            write(pipefd[1], ((munit_uint8_t *)(&report)) + bytes_written,
-                  sizeof(report) - (size_t)bytes_written);
+          write(pipefd[1], ((munit_uint8_t *)(&report)) + bytes_written,
+                sizeof(report) - (size_t)bytes_written);
         if (write_res < 0) {
           if (stderr_buf != NULL) {
             munit_log_errno(MUNIT_LOG_ERROR, stderr, "unable to write to pipe");
@@ -1673,7 +1666,7 @@ static void munit_test_runner_run_test(MunitTestRunner *runner,
                                        const MunitTest *test,
                                        const char *prefix) {
   char *test_name =
-      munit_maybe_concat(NULL, (char *)prefix, (char *)test->name);
+    munit_maybe_concat(NULL, (char *)prefix, (char *)test->name);
   /* The array of parameters to pass to
    * munit_test_runner_run_test_with_params */
   MunitParameter *params = NULL;
@@ -1835,49 +1828,49 @@ static void munit_print_help(int argc, char *const *argv, void *user_data,
 
   printf("USAGE: %s [OPTIONS...] [TEST...]\n\n", argv[0]);
   puts(
-      " --seed SEED\n"
-      "           Value used to seed the PRNG.  Must be a 32-bit integer in "
-      "decimal\n"
-      "           notation with no separators (commas, decimals, spaces, "
-      "etc.), or\n"
-      "           hexidecimal prefixed by \"0x\".\n"
-      " --iterations N\n"
-      "           Run each test N times.  0 means the default number.\n"
-      " --param name value\n"
-      "           A parameter key/value pair which will be passed to any test "
-      "with\n"
-      "           takes a parameter of that name.  If not provided, the test "
-      "will be\n"
-      "           run once for each possible parameter value.\n"
-      " --list    Write a list of all available tests.\n"
-      " --list-params\n"
-      "           Write a list of all available tests and their possible "
-      "parameters.\n"
-      " --single  Run each parameterized test in a single configuration "
-      "instead of\n"
-      "           every possible combination\n"
-      " --log-visible debug|info|warning|error\n"
-      " --log-fatal debug|info|warning|error\n"
-      "           Set the level at which messages of different severities are "
-      "visible,\n"
-      "           or cause the test to terminate.\n"
+    " --seed SEED\n"
+    "           Value used to seed the PRNG.  Must be a 32-bit integer in "
+    "decimal\n"
+    "           notation with no separators (commas, decimals, spaces, "
+    "etc.), or\n"
+    "           hexidecimal prefixed by \"0x\".\n"
+    " --iterations N\n"
+    "           Run each test N times.  0 means the default number.\n"
+    " --param name value\n"
+    "           A parameter key/value pair which will be passed to any test "
+    "with\n"
+    "           takes a parameter of that name.  If not provided, the test "
+    "will be\n"
+    "           run once for each possible parameter value.\n"
+    " --list    Write a list of all available tests.\n"
+    " --list-params\n"
+    "           Write a list of all available tests and their possible "
+    "parameters.\n"
+    " --single  Run each parameterized test in a single configuration "
+    "instead of\n"
+    "           every possible combination\n"
+    " --log-visible debug|info|warning|error\n"
+    " --log-fatal debug|info|warning|error\n"
+    "           Set the level at which messages of different severities are "
+    "visible,\n"
+    "           or cause the test to terminate.\n"
 #if !defined(MUNIT_NO_FORK)
-      " --no-fork Do not execute tests in a child process.  If this option is "
-      "supplied\n"
-      "           and a test crashes (including by failing an assertion), no "
-      "further\n"
-      "           tests will be performed.\n"
+    " --no-fork Do not execute tests in a child process.  If this option is "
+    "supplied\n"
+    "           and a test crashes (including by failing an assertion), no "
+    "further\n"
+    "           tests will be performed.\n"
 #endif
-      " --fatal-failures\n"
-      "           Stop executing tests as soon as a failure is found.\n"
-      " --show-stderr\n"
-      "           Show data written to stderr by the tests, even if the test "
-      "succeeds.\n"
-      " --color auto|always|never\n"
-      "           Colorize (or don't) the output.\n"
-      /* 12345678901234567890123456789012345678901234567890123456789012345678901234567890
-       */
-      " --help    Print this help message and exit.\n");
+    " --fatal-failures\n"
+    "           Stop executing tests as soon as a failure is found.\n"
+    " --show-stderr\n"
+    "           Show data written to stderr by the tests, even if the test "
+    "succeeds.\n"
+    " --color auto|always|never\n"
+    "           Colorize (or don't) the output.\n"
+    /* 12345678901234567890123456789012345678901234567890123456789012345678901234567890
+     */
+    " --help    Print this help message and exit.\n");
 #if defined(MUNIT_NL_LANGINFO)
   setlocale(LC_ALL, "");
   fputs((strcasecmp("UTF-8", nl_langinfo(CODESET)) == 0) ? "µnit" : "munit",
@@ -2067,8 +2060,8 @@ int munit_suite_main_custom(const MunitSuite *suite, void *user_data, int argc,
           goto cleanup;
         }
 
-        runner.parameters = realloc(
-            runner.parameters, sizeof(MunitParameter) * (parameters_size + 2));
+        runner.parameters = realloc(runner.parameters, sizeof(MunitParameter) *
+                                                         (parameters_size + 2));
         if (runner.parameters == NULL) {
           munit_log_internal(MUNIT_LOG_ERROR, stderr,
                              "failed to allocate memory");
@@ -2165,7 +2158,7 @@ int munit_suite_main_custom(const MunitSuite *suite, void *user_data, int argc,
       }
     } else {
       runner_tests =
-          realloc((void *)runner.tests, sizeof(char *) * (tests_size + 2));
+        realloc((void *)runner.tests, sizeof(char *) * (tests_size + 2));
       if (runner_tests == NULL) {
         munit_log_internal(MUNIT_LOG_ERROR, stderr,
                            "failed to allocate memory");
@@ -2184,7 +2177,7 @@ int munit_suite_main_custom(const MunitSuite *suite, void *user_data, int argc,
   munit_test_runner_run(&runner);
 
   tests_run =
-      runner.report.successful + runner.report.failed + runner.report.errored;
+    runner.report.successful + runner.report.failed + runner.report.errored;
   tests_total = tests_run + runner.report.skipped;
   if (tests_run == 0) {
     fprintf(stderr, "No tests run, %d (100%%) skipped.\n",

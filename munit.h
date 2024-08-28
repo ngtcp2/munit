@@ -295,8 +295,8 @@ void munit_errorf_ex(const char *filename, int line, const char *format, ...);
     const double munit_tmp_a_ = (a);                                           \
     const double munit_tmp_b_ = (b);                                           \
     const double munit_tmp_diff_ = ((munit_tmp_a_ - munit_tmp_b_) < 0)         \
-                                       ? -(munit_tmp_a_ - munit_tmp_b_)        \
-                                       : (munit_tmp_a_ - munit_tmp_b_);        \
+                                     ? -(munit_tmp_a_ - munit_tmp_b_)          \
+                                     : (munit_tmp_a_ - munit_tmp_b_);          \
     if (MUNIT_UNLIKELY(munit_tmp_diff_ > 1e-##precision)) {                    \
       munit_errorf("assertion failed: %s == %s (%0." #precision                \
                    "g == %0." #precision "g)",                                 \
@@ -551,10 +551,9 @@ int munit_suite_main_custom(const MunitSuite *suite, void *user_data, int argc,
   }
 
 #define munit_void_test(func)                                                  \
-  { "/" #func, wrap_##func, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+  {"/" #func, wrap_##func, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 
-#define munit_test_end()                                                       \
-  { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
+#define munit_test_end() {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}
 
 int munit_hexdump(FILE *fp, const void *data, size_t datalen);
 

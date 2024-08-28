@@ -56,9 +56,9 @@
         munit_hexdump_diff(stderr, munit_tmp_a_.data(), munit_tmp_a_.size(),   \
                            munit_tmp_b_.data(), munit_tmp_b_.size());          \
         munit_errorf(                                                          \
-            "assertion failed: string %s == %s (\"%.*s\" == \"%.*s\")", #a,    \
-            #b, (int)munit_tmp_a_.size(), munit_tmp_a_.data(),                 \
-            (int)munit_tmp_b_.size(), munit_tmp_b_.data());                    \
+          "assertion failed: string %s == %s (\"%.*s\" == \"%.*s\")", #a, #b,  \
+          (int)munit_tmp_a_.size(), munit_tmp_a_.data(),                       \
+          (int)munit_tmp_b_.size(), munit_tmp_b_.data());                      \
       }                                                                        \
       MUNIT_PUSH_DISABLE_MSVC_C4127_                                           \
     } while (0) MUNIT_POP_DISABLE_MSVC_C4127_
@@ -70,11 +70,11 @@
     auto munit_tmp_b_ = (b);                                                   \
     if (!(munit_tmp_a_ op munit_tmp_b_)) {                                     \
       auto munit_tmp_a_str_ = std::to_string(                                  \
-          static_cast<std::underlying_type_t<decltype(munit_tmp_a_)>>(         \
-              munit_tmp_a_));                                                  \
+        static_cast<std::underlying_type_t<decltype(munit_tmp_a_)>>(           \
+          munit_tmp_a_));                                                      \
       auto munit_tmp_b_str_ = std::to_string(                                  \
-          static_cast<std::underlying_type_t<decltype(munit_tmp_b_)>>(         \
-              munit_tmp_b_));                                                  \
+        static_cast<std::underlying_type_t<decltype(munit_tmp_b_)>>(           \
+          munit_tmp_b_));                                                      \
       munit_errorf("assertion failed: %s %s %s (%s %s %s)", #a, #op, #b,       \
                    munit_tmp_a_str_.c_str(), #op, munit_tmp_b_str_.c_str());   \
     }                                                                          \

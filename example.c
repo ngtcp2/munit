@@ -15,24 +15,23 @@
  * code.  It's only here because we want to be able to do silly things
  * like assert that 0 != 1 for our demo. */
 #if defined(_MSC_VER)
-#pragma warning(disable: 4127)
+#  pragma warning(disable : 4127)
 #endif
 
 /* Tests are functions that return void, and take a single void*
  * parameter.  We'll get to what that parameter is later. */
-static MunitResult
-test_compare(const MunitParameter params[], void* data) {
+static MunitResult test_compare(const MunitParameter params[], void *data) {
   /* We'll use these later */
   const unsigned char val_uchar = 'b';
   const short val_short = 1729;
   double pi = 3.141592654;
-  char* stewardesses = "stewardesses";
-  char* most_fun_word_to_type;
+  char *stewardesses = "stewardesses";
+  char *most_fun_word_to_type;
 
   /* These are just to silence compiler warnings about the parameters
    * being unused. */
-  (void) params;
-  (void) data;
+  (void)params;
+  (void)data;
 
   /* Let's start with the basics. */
   munit_assert(0 != 1);
@@ -113,19 +112,18 @@ test_compare(const MunitParameter params[], void* data) {
    * Note that the casting isn't usually required; if you give this
    * function a real pointer (instead of a number like 0xdeadbeef) it
    * would work as expected. */
-  munit_assert_ptr_equal(data, (void*)(uintptr_t)0xdeadbeef);
+  munit_assert_ptr_equal(data, (void *)(uintptr_t)0xdeadbeef);
 
   return MUNIT_OK;
 }
 
-static MunitResult
-test_rand(const MunitParameter params[], void* user_data) {
+static MunitResult test_rand(const MunitParameter params[], void *user_data) {
   int random_int;
   double random_dbl;
   munit_uint8_t data[5];
 
-  (void) params;
-  (void) user_data;
+  (void)params;
+  (void)user_data;
 
   /* One thing missing from a lot of unit testing frameworks is a
    * random number generator.  You can't just use srand/rand because
@@ -176,12 +174,12 @@ test_rand(const MunitParameter params[], void* user_data) {
  * run specific test(s), or you can pass the --single argument to the
  * CLI to have the harness simply choose one variation at random
  * instead of running them all. */
-static MunitResult
-test_parameters(const MunitParameter params[], void* user_data) {
-  const char* foo;
-  const char* bar;
+static MunitResult test_parameters(const MunitParameter params[],
+                                   void *user_data) {
+  const char *foo;
+  const char *bar;
 
-  (void) user_data;
+  (void)user_data;
 
   /* The "foo" parameter is specified as one of the following values:
    * "one", "two", or "three". */
@@ -213,13 +211,11 @@ test_parameters(const MunitParameter params[], void* user_data) {
    *    down.
    */
 
-  if (strcmp(foo, "one") != 0 &&
-      strcmp(foo, "two") != 0 &&
+  if (strcmp(foo, "one") != 0 && strcmp(foo, "two") != 0 &&
       strcmp(foo, "three") != 0)
     return MUNIT_FAIL;
 
-  if (strcmp(bar, "red") != 0 &&
-      strcmp(bar, "green") != 0 &&
+  if (strcmp(bar, "red") != 0 && strcmp(bar, "green") != 0 &&
       strcmp(bar, "blue") != 0)
     return MUNIT_FAIL;
 
@@ -229,77 +225,72 @@ test_parameters(const MunitParameter params[], void* user_data) {
 /* The setup function, if you provide one, for a test will be run
  * before the test, and the return value will be passed as the sole
  * parameter to the test function. */
-static void*
-test_compare_setup(const MunitParameter params[], void* user_data) {
-  (void) params;
+static void *test_compare_setup(const MunitParameter params[],
+                                void *user_data) {
+  (void)params;
 
   munit_assert_string_equal(user_data, "µnit");
-  return (void*) (uintptr_t) 0xdeadbeef;
+  return (void *)(uintptr_t)0xdeadbeef;
 }
 
 /* To clean up after a test, you can use a tear down function.  The
  * fixture argument is the value returned by the setup function
  * above. */
-static void
-test_compare_tear_down(void* fixture) {
-  munit_assert_ptr_equal(fixture, (void*)(uintptr_t)0xdeadbeef);
+static void test_compare_tear_down(void *fixture) {
+  munit_assert_ptr_equal(fixture, (void *)(uintptr_t)0xdeadbeef);
 }
 
-static char* foo_params[] = {
-  (char*) "one", (char*) "two", (char*) "three", NULL
-};
+static char *foo_params[] = {(char *)"one", (char *)"two", (char *)"three",
+                             NULL};
 
-static char* bar_params[] = {
-  (char*) "red", (char*) "green", (char*) "blue", NULL
-};
+static char *bar_params[] = {(char *)"red", (char *)"green", (char *)"blue",
+                             NULL};
 
 static MunitParameterEnum test_params[] = {
-  { (char*) "foo", foo_params },
-  { (char*) "bar", bar_params },
-  { (char*) "baz", NULL },
-  { NULL, NULL },
+  {(char *)"foo", foo_params},
+  {(char *)"bar", bar_params},
+  {(char *)"baz", NULL},
+  {NULL, NULL},
 };
 
 /* Creating a test suite is pretty simple.  First, you'll need an
  * array of tests: */
 static MunitTest test_suite_tests[] = {
-  {
-    /* The name is just a unique human-readable way to identify the
-     * test. You can use it to run a specific test if you want, but
-     * usually it's mostly decorative. */
-    (char*) "/example/compare",
-    /* You probably won't be surprised to learn that the tests are
-     * functions. */
-    test_compare,
-    /* If you want, you can supply a function to set up a fixture.  If
-     * you supply NULL, the user_data parameter from munit_suite_main
-     * will be used directly.  If, however, you provide a callback
-     * here the user_data parameter will be passed to this callback,
-     * and the return value from this callback will be passed to the
-     * test function.
-     *
-     * For our example we don't really need a fixture, but lets
-     * provide one anyways. */
-    test_compare_setup,
-    /* If you passed a callback for the fixture setup function, you
-     * may want to pass a corresponding callback here to reverse the
-     * operation. */
-    test_compare_tear_down,
-    /* Finally, there is a bitmask for options you can pass here.  You
-     * can provide either MUNIT_TEST_OPTION_NONE or 0 here to use the
-     * defaults. */
-    MUNIT_TEST_OPTION_NONE,
-    NULL
-  },
+  {/* The name is just a unique human-readable way to identify the
+    * test. You can use it to run a specific test if you want, but
+    * usually it's mostly decorative. */
+   (char *)"/example/compare",
+   /* You probably won't be surprised to learn that the tests are
+    * functions. */
+   test_compare,
+   /* If you want, you can supply a function to set up a fixture.  If
+    * you supply NULL, the user_data parameter from munit_suite_main
+    * will be used directly.  If, however, you provide a callback
+    * here the user_data parameter will be passed to this callback,
+    * and the return value from this callback will be passed to the
+    * test function.
+    *
+    * For our example we don't really need a fixture, but lets
+    * provide one anyways. */
+   test_compare_setup,
+   /* If you passed a callback for the fixture setup function, you
+    * may want to pass a corresponding callback here to reverse the
+    * operation. */
+   test_compare_tear_down,
+   /* Finally, there is a bitmask for options you can pass here.  You
+    * can provide either MUNIT_TEST_OPTION_NONE or 0 here to use the
+    * defaults. */
+   MUNIT_TEST_OPTION_NONE, NULL},
   /* Usually this is written in a much more compact format; all these
    * comments kind of ruin that, though.  Here is how you'll usually
    * see entries written: */
-  { (char*) "/example/rand", test_rand, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL },
+  {(char *)"/example/rand", test_rand, NULL, NULL, MUNIT_TEST_OPTION_NONE,
+   NULL},
   /* To tell the test runner when the array is over, just add a NULL
    * entry at the end. */
-  { (char*) "/example/parameters", test_parameters, NULL, NULL, MUNIT_TEST_OPTION_NONE, test_params },
-  { NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL }
-};
+  {(char *)"/example/parameters", test_parameters, NULL, NULL,
+   MUNIT_TEST_OPTION_NONE, test_params},
+  {NULL, NULL, NULL, NULL, MUNIT_TEST_OPTION_NONE, NULL}};
 
 /* If you wanted to have your test suite run other test suites you
  * could declare an array of them.  Of course each sub-suite can
@@ -317,7 +308,7 @@ static const MunitSuite test_suite = {
    * Note that, while it doesn't really matter for the top-level
    * suite, NULL signal the end of an array of tests; you should use
    * an empty string ("") instead. */
-  (char*) "",
+  (char *)"",
   /* The first parameter is the array of test suites. */
   test_suite_tests,
   /* In addition to containing test cases, suites can contain other
@@ -334,8 +325,7 @@ static const MunitSuite test_suite = {
   1,
   /* Just like MUNIT_TEST_OPTION_NONE, you can provide
    * MUNIT_SUITE_OPTION_NONE or 0 to use the default settings. */
-  MUNIT_SUITE_OPTION_NONE
-};
+  MUNIT_SUITE_OPTION_NONE};
 
 /* This is only necessary for EXIT_SUCCESS and EXIT_FAILURE, which you
  * *should* be using but probably aren't (no, zero and non-zero don't
@@ -343,9 +333,9 @@ static const MunitSuite test_suite = {
  * about µnit requires it. */
 #include <stdlib.h>
 
-int main(int argc, char* argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
+int main(int argc, char *argv[MUNIT_ARRAY_PARAM(argc + 1)]) {
   /* Finally, we'll actually run our test suite!  That second argument
    * is the user_data parameter which will be passed either to the
    * test or (if provided) the fixture setup function. */
-  return munit_suite_main(&test_suite, (void*) "µnit", argc, argv);
+  return munit_suite_main(&test_suite, (void *)"µnit", argc, argv);
 }
